@@ -4,17 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.b1tf0m0</groupId>
-    <artifactId>BitF0M0</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <modules>
-        <module>binance-feeder</module>
-        <module>reddit-feeder</module>
-        <module>event-store-builder</module>
-        <module>broker-connection</module>
-        <module>common-utils</module>
-    </modules>
+    <parent>
+        <groupId>com.b1tf0m0</groupId>
+        <artifactId>BitF0M0</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>binance-feeder</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -24,9 +20,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20250107</version>
+            <groupId>com.b1tf0m0</groupId>
+            <artifactId>common-utils</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
