@@ -1,9 +1,11 @@
 package com.b1tf0m0.binance.feeder;
 
 import com.b1tf0m0.binance.api.BinanceApi;
+import com.b1tf0m0.binance.database.BinanceEventInserter;
 import com.b1tf0m0.common.event.DefaultEventBuilder;
 import com.b1tf0m0.common.event.EventFileSaver;
 import com.b1tf0m0.common.feeder.Feeder;
+import org.json.JSONObject;
 
 public class BinanceFeeder implements Feeder {
 
@@ -14,11 +16,15 @@ public class BinanceFeeder implements Feeder {
             String rawJson = binanceApi.fetchInformation();
 
             DefaultEventBuilder eventBuilder = new DefaultEventBuilder();
-            String eventJson = eventBuilder.buildEvent("BinanceFeeder", rawJson);
+            String eventJsonString = eventBuilder.buildEvent("BinanceFeeder", rawJson);
 
-            if (eventJson != null) {
+            if (eventJsonString != null) {
                 EventFileSaver fileSaver = new EventFileSaver();
-                fileSaver.saveEvent("CryptoPrice", "BinanceFeeder", eventJson);
+                fileSaver.saveEvent("CryptoPrice", "BinanceFeeder", eventJsonString);
+
+                JSONObject eventJson = new JSONObject(eventJsonString);
+                BinanceEventInserter inserter = new BinanceEventInserter();
+                inserter.insertEvent(eventJson);
             }
         } catch (Exception e) {
             e.printStackTrace();
