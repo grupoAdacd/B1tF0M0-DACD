@@ -5,7 +5,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JSONParse implements JSONParseProvider{
-
     private final String jsonString;
 
     public JSONParse(String jsonString) {

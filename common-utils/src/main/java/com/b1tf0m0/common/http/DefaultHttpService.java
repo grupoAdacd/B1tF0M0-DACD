@@ -27,7 +27,7 @@ public class DefaultHttpService implements DefaultHttpServiceProvider  {
     public HttpRequest createRequest() {
         ApiUrlBuilder apiUrlBuilder = new ApiUrlBuilder(baseUrl, addition);
         return HttpRequest.newBuilder()
-                .uri(URI.create(apiUrlBuilder.createApiUrl())).timeout(Duration.ofSeconds(10)).build();
+                .uri(URI.create(apiUrlBuilder .createApiUrl())).timeout(Duration.ofSeconds(10)).build();
     }
 
     @Override
