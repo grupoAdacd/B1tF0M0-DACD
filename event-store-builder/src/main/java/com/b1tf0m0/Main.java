@@ -1,17 +1,34 @@
-package com.b1tf0m0;
+package com.b1tf0m0.eventstore;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+
 public class Main {
-    public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+    private static final String EVENT_STORE_BASE_PATH = "src/main/eventstore";
+    private static final List<EventStoreBuilder> builders = new ArrayList<>();
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+    public static void main(String[] args) {
+        System.out.println("🚀 Iniciando Event Store Builder...");
+        List<String> topics = Arrays.asList("Weather", "CryptoPrice", "RedditPost");
+        for (String topic : topics) {
+            EventStoreBuilder builder = new EventStoreBuilder(topic, EVENT_STORE_BASE_PATH);
+            builder.start();
+            builders.add(builder);
+            System.out.println("✅ EventStoreBuilder iniciado para topic: " + topic);
+        }
+        System.out.println("Event Store Builder en ejecución. Presiona Ctrl+C para detener.");
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("⚠️ Cerrando conexiones...");
+            for (EventStoreBuilder builder : builders) {
+                builder.stop();
+            }
+            System.out.println("👋 Event Store Builder detenido correctamente.");
+        }));
+        try {
+            Thread.currentThread().join();
+        } catch (InterruptedException e) {
+            System.out.println("⚠️ Aplicación interrumpida.");
         }
     }
 }

@@ -10,7 +10,9 @@ import org.json.JSONObject;
 
 public class BinanceFeeder implements Feeder {
 
-    //TODO APPLY SRP
+    private static final String SOURCE_SYSTEM = "BinanceFeeder";
+    private static final String TOPIC_NAME = "CryptoPrice";
+
     @Override
     public void fetchAndSaveEvent() {
         System.out.println("🔥 Ejecutando fetchAndSaveEvent en BinanceFeeder...");
@@ -20,19 +22,21 @@ public class BinanceFeeder implements Feeder {
             String rawJson = binanceApi.fetchInformation();
 
             DefaultEventBuilder eventBuilder = new DefaultEventBuilder();
-            String eventJsonString = eventBuilder.buildEvent("BinanceFeeder", rawJson);
+            String eventJsonString = eventBuilder.buildEvent(SOURCE_SYSTEM, rawJson);
 
             if (eventJsonString != null) {
                 EventFileSaver fileSaver = new EventFileSaver();
-                fileSaver.saveEvent("CryptoPrice", "BinanceFeeder", eventJsonString);
+                fileSaver.saveEvent(TOPIC_NAME, SOURCE_SYSTEM, eventJsonString);
 
                 JSONObject eventJson = new JSONObject(eventJsonString);
                 BinanceEventInserter inserter = new BinanceEventInserter();
                 inserter.insertEvent(eventJson);
 
-                EventPublisher.publishEvent("CryptoPrice", eventJsonString);
+                EventPublisher.publishEvent(TOPIC_NAME, eventJson, SOURCE_SYSTEM);
+                System.out.println("✅ Evento de Binance publicado en topic: " + TOPIC_NAME);
             }
         } catch (Exception e) {
+            System.err.println("❌ Error en BinanceFeeder: " + e.getMessage());
             e.printStackTrace();
         }
     }
