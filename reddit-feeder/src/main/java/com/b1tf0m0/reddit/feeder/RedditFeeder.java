@@ -1,5 +1,6 @@
 package com.b1tf0m0.reddit.feeder;
 
+import com.b1tf0m0.common.broker.EventPublisher;
 import com.b1tf0m0.common.event.DefaultEventBuilder;
 import com.b1tf0m0.common.event.EventFileSaver;
 import com.b1tf0m0.common.feeder.Feeder;
@@ -15,9 +16,11 @@ public class RedditFeeder implements Feeder {
     public RedditFeeder(String subreddit) {
         this.subreddit = subreddit;
     }
-//TODO apply SRP
+
+    //TODO APPLY SRP
     @Override
     public void fetchAndSaveEvent() {
+        System.out.println("🔥 Ejecutando fetchAndSaveEvent en RedditFeeder...");
         try {
             String apiUrl = String.format("https://www.reddit.com/r/%s/new.json?limit=100&t=all", subreddit);
             RedditApi redditApi = new RedditApi(apiUrl, "");
@@ -40,6 +43,8 @@ public class RedditFeeder implements Feeder {
                     JSONObject eventJson = new JSONObject(eventJsonString);
                     RedditEventInserter inserter = new RedditEventInserter();
                     inserter.insertEvent(eventJson);
+
+                    EventPublisher.publishEvent("RedditPost", eventJsonString);
                 }
             }
 
