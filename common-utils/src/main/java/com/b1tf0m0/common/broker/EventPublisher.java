@@ -1,8 +1,8 @@
 package com.b1tf0m0.common.broker;
 
+import com.b1tf0m0.common.json.JSONParse;
 import org.json.JSONObject;
 
-import javax.jms.Connection;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
@@ -12,21 +12,20 @@ import java.time.Instant;
 
 public class EventPublisher {
 
-    public static void publishEvent(String topicName, String eventJson, String sourceSystem) {
-        Connection connection = null;
-        Session session = null;
+    public static void publishEvent(String topicName, String eventJsonString, String sourceSystem) {
+        Session session;
 
         try {
             System.out.println("🚀 Intentando publicar evento en Topic [" + topicName + "]...");
 
-            JSONObject jsonObject = new JSONObject(eventJson);
+            JSONParse jsonObject = new JSONParse(eventJsonString);
 
-            if (!jsonObject.has("ts")) {
-                jsonObject.put("ts", Instant.now().toString());
+            if (!jsonObject.parseObject().has("ts")) {
+                jsonObject.parseObject().put("ts", Instant.now().toString());
             }
 
-            if (!jsonObject.has("ss")) {
-                jsonObject.put("ss", sourceSystem);
+            if (!jsonObject.parseObject().has("ss")) {
+                jsonObject.parseObject().put("ss", sourceSystem);
             }
             session = ActiveMQConnectionManager.getSession();
 
@@ -48,12 +47,12 @@ public class EventPublisher {
         }
     }
 
-    public static void publishEvent(String topicName, JSONObject eventData, String sourceSystem) {
-        if (!eventData.has("ts")) {
-            eventData.put("ts", Instant.now().toString());
+    public static void publishEvent(String topicName, JSONParse eventData, String sourceSystem) {
+        if (!eventData.parseObject().has("ts")) {
+            eventData.parseObject().put("ts", Instant.now().toString());
         }
-        if (!eventData.has("ss")) {
-            eventData.put("ss", sourceSystem);
+        if (!eventData.parseObject().has("ss")) {
+            eventData.parseObject().put("ss", sourceSystem);
         }
         publishEvent(topicName, eventData.toString(), sourceSystem);
     }

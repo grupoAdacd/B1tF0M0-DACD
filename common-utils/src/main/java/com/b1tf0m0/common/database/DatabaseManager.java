@@ -18,23 +18,25 @@ public class DatabaseManager {
                     "subreddit TEXT NOT NULL," +
                     "author TEXT NOT NULL," +
                     "title TEXT NOT NULL," +
-                    "selftext TEXT," +
-                    "linkToSite TEXT," +
-                    "numComments INTEGER," +
-                    "subscribers INTEGER," +
+                    "post_text TEXT," +
+                    "post_link TEXT," +
+                    "number_of_comments INTEGER," +
+                    "number_of_subscribers INTEGER," +
                     "sentiment TEXT," +
-                    "createdAt TEXT NOT NULL" +
+                    "created_date DATE" +
                     ");";
 
             String sqlBinance = "CREATE TABLE IF NOT EXISTS BinanceEvents (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "Kline_Open_Time DATE," +
+                    "open_price REAL," +
+                    "high_price REAL," +
+                    "low_price REAL," +
+                    "close_price REAL," +
                     "volume REAL," +
-                    "openPrice REAL," +
-                    "lowPrice REAL," +
-                    "highPrice REAL," +
-                    "priceChangePercent REAL," +
-                    "currentPrice REAL," +
-                    "date TEXT NOT NULL" +
+                    "Kline_Close_Time DATE," +
+                    "quote_asset_volume REAL," +
+                    "number_of_trades INTEGER" +
                     ");";
 
             stmt.execute(sqlReddit);

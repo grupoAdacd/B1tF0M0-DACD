@@ -51,29 +51,14 @@ public class RedditDataSaver extends DefaultFileSaver {
                     writer.write("Total posts: " + postCount + "\n\n");
 
                     for (int i = 0; i < postCount; i++) {
-                        String subreddit;
-                        subreddit = children.parseArray().getJSONArray(4).getJSONObject(i).getJSONObject("data").getString("subreddit");
-
-                        String author;
-                        author = children.parseArray().getJSONArray(4).getJSONObject(i).getJSONObject("data").getString("author");
-
-                        String title;
-                        title = children.parseArray().getJSONArray(4).getJSONObject(i).getJSONObject("data").getString("title");
-
-                        String selftext;
-                        selftext = children.parseArray().getJSONArray(4).getJSONObject(i).getJSONObject("data").optString("selftext", "");
-
-                        String url;
-                        url = children.parseArray().getJSONArray(4).getJSONObject(i).getJSONObject("data").getString("url");
-
-                        int numComments;
-                        numComments = children.parseArray().getJSONArray(4).getJSONObject(i).getJSONObject("data").getInt("num_comments");
-
-                        int subscribers;
-                        subscribers = children.parseArray().getJSONArray(4).getJSONObject(i).getJSONObject("data").getInt("subreddit_subscribers");
-
-                        long createdUtc;
-                        createdUtc = children.parseArray().getJSONArray(4).getJSONObject(i).getJSONObject("data").getLong("created_utc");
+                        String subreddit = children.parseArray().getJSONArray(4).getJSONObject(i).getJSONObject("data").getString("subreddit");
+                        String author = children.parseArray().getJSONArray(4).getJSONObject(i).getJSONObject("data").getString("author");
+                        String title = children.parseArray().getJSONArray(4).getJSONObject(i).getJSONObject("data").getString("title");
+                        String selftext = children.parseArray().getJSONArray(4).getJSONObject(i).getJSONObject("data").optString("selftext", "");
+                        String url = children.parseArray().getJSONArray(4).getJSONObject(i).getJSONObject("data").getString("url");
+                        int numComments = children.parseArray().getJSONArray(4).getJSONObject(i).getJSONObject("data").getInt("num_comments");
+                        int subscribers = children.parseArray().getJSONArray(4).getJSONObject(i).getJSONObject("data").getInt("subreddit_subscribers");
+                        long createdUtc = children.parseArray().getJSONArray(4).getJSONObject(i).getJSONObject("data").getLong("created_utc");
                         LocalDateTime postTime = LocalDateTime.ofInstant(
                                 Instant.ofEpochSecond(createdUtc), ZoneOffset.UTC);
 

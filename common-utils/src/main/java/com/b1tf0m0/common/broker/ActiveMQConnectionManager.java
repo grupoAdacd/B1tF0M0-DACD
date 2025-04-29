@@ -14,7 +14,6 @@ public class ActiveMQConnectionManager {
     private static final String DEFAULT_BROKER_URL = "tcp://localhost:61616";
     private static final String DEFAULT_USERNAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";
-
     private static String brokerUrl;
     private static String username;
     private static String password;
@@ -27,27 +26,33 @@ public class ActiveMQConnectionManager {
     }
 
     private static void loadProperties() {
+        brokerUrl = getEnvOrDefault("ACTIVEMQ_BROKER_URL", DEFAULT_BROKER_URL);
+        username = getEnvOrDefault("ACTIVEMQ_USERNAME", DEFAULT_USERNAME);
+        password = getEnvOrDefault("ACTIVEMQ_PASSWORD", DEFAULT_PASSWORD);
+
         try (InputStream input = ActiveMQConnectionManager.class.getClassLoader().getResourceAsStream("/home/d4rk/IdeaProjects/B1tF0M0-DACD/src/main/resources/broker.properties")) {
             Properties prop = new Properties();
             if (input != null) {
                 prop.load(input);
-                brokerUrl = prop.getProperty("broker.url", DEFAULT_BROKER_URL);
-                username = prop.getProperty("broker.username", DEFAULT_USERNAME);
-                password = prop.getProperty("broker.password", DEFAULT_PASSWORD);
-                System.out.println("✅ broker.properties cargado correctamente:");
+                if (System.getenv("ACTIVEMQ_BROKER_URL") == null) {
+                    brokerUrl = prop.getProperty("broker.url", brokerUrl);
+                }
+                if (System.getenv("ACTIVEMQ_USERNAME") == null) {
+                    username = prop.getProperty("broker.username", username);
+                }
+                if (System.getenv("ACTIVEMQ_PASSWORD") == null) {
+                    password = prop.getProperty("broker.password", password);
+                }
+                System.out.println("✅ Configuración cargada:");
                 System.out.println("   BROKER_URL = " + brokerUrl);
                 System.out.println("   USERNAME = " + username);
+                System.out.println("   (Valores pueden provenir de variables de entorno o broker.properties)");
             } else {
-                System.err.println("⚠️ broker.properties no encontrado, usando valores por defecto");
-                brokerUrl = DEFAULT_BROKER_URL;
-                username = DEFAULT_USERNAME;
-                password = DEFAULT_PASSWORD;
+                System.out.println("⚠️ broker.properties no encontrado, usando configuración actual");
             }
         } catch (IOException ex) {
             System.err.println("❌ Error cargando broker.properties: " + ex.getMessage());
-            brokerUrl = DEFAULT_BROKER_URL;
-            username = DEFAULT_USERNAME;
-            password = DEFAULT_PASSWORD;
+            System.out.println("   Usando configuración actual");
         }
     }
 
@@ -88,5 +93,10 @@ public class ActiveMQConnectionManager {
         } catch (JMSException e) {
             System.err.println("❌ Error al cerrar la conexión con ActiveMQ: " + e.getMessage());
         }
+    }
+
+    private static String getEnvOrDefault(String envName, String defaultValue) {
+        String value = System.getenv(envName);
+        return (value != null && !value.isEmpty()) ? value : defaultValue;
     }
 }
