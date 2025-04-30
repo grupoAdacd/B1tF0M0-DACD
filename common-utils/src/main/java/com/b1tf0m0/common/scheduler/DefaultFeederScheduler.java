@@ -20,7 +20,7 @@ public class DefaultFeederScheduler {
         scheduler.scheduleAtFixedRate(() -> {
             try {
                 for (Feeder feeder : feeders) {
-                    feeder.fetchAndSaveEvent();
+                    feeder.feederDataFetchAndSave();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
