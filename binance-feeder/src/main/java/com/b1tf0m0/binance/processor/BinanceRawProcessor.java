@@ -1,6 +1,7 @@
 package com.b1tf0m0.binance.processor;
 
 import com.b1tf0m0.binance.api.BinanceKline;
+import com.b1tf0m0.binance.feeder.BinanceFeeder;
 import com.b1tf0m0.common.json.JSONParse;
 import org.json.JSONArray;
 
@@ -9,6 +10,7 @@ public class BinanceRawProcessor {
     public BinanceKline processRawToObject(String eventJsonString) {
         if (!eventJsonString.isEmpty() && eventJsonString != null) {
             JSONParse eventParser = new JSONParse(eventJsonString);
+            System.out.println(eventParser);
             for (int i=0; i<1000; i++) {
                 JSONArray jsonArray = eventParser.parseArray();
                 JSONArray Kline = new JSONArray(jsonArray.get(i));

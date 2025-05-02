@@ -22,7 +22,7 @@ public class RedditInTimeFetcher {
         }
 
         try {
-            System.out.println("Programa de recolección iniciado. Presiona Ctrl+C para detener.");
+            System.out.println("Programa de recolección iniciado.");
             Thread.sleep(Long.MAX_VALUE);
         } catch (InterruptedException e) {
             System.out.println("Programa detenido");

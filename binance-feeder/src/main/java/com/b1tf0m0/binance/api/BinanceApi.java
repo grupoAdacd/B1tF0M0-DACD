@@ -1,35 +1,28 @@
 package com.b1tf0m0.binance.api;
 
-import com.b1tf0m0.common.fetch.DefaultFetch;
+import com.b1tf0m0.binance.feeder.BinanceFeeder;
+import com.b1tf0m0.common.fetch.DefaultBinanceFetchClasses.DefaultBinanceFetch;
 import com.b1tf0m0.common.json.JSONParse;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.*;
 
-public class BinanceApi extends DefaultFetch {
-    private static final String base_fetch_api_url = "https://api.binance.com/api/v3/ticker/24hr?symbol=";
-    private static final String fetch_when_api_url = "https://api.binance.com/api/v3/uiKlines?symbol=";
-    private static final String symbol = "BTCUSDT";
-    private static LocalDateTime startDateTime;
-    private static LocalDateTime endDateTime = LocalDateTime.now();
-    private static final String interval = "&interval=6h";
-    public static String limit = "&limit=1000";
+public class BinanceApi extends DefaultBinanceFetch {
+    private long startDateTime;
+    private long endDateTime = LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli();
 
-    public static void main(String[] args) throws IOException {
-        System.out.println(obtainFullResponse());
+    public static void main(String[] args) {
+        BinanceApi binanceApi = new BinanceApi("BTCUSDT");
+        System.out.println(binanceApi.obtainFullResponse());
     }
 
-    public static ArrayList<String> obtainFullResponse() throws IOException {
+    public BinanceApi(String symbol) {
+        this.setSymbol(symbol);
+    }
+
+    public ArrayList<String> obtainFullResponse() {
         ArrayList<String> fullResponse = new ArrayList<>();
-        BinanceApi binanceApi = new BinanceApi(fetch_when_api_url, symbol.concat(interval + limit));
+        BinanceApi binanceApi = new BinanceApi("BTCUSDT");
         for (int i = 0; i < 11; i++) {
             String response = binanceApi.fetchWhenInformation(startDateTime, endDateTime);
             fullResponse.add(response);
@@ -38,9 +31,7 @@ public class BinanceApi extends DefaultFetch {
                 String lastKline = responseJSArray.parseArray().get(999).toString();
                 String[] klineElements = lastKline.replace("[", "").replace("]", "").split(",");
                 if (klineElements.length >= 7) {
-                    long closeTimeMillis = Long.parseLong(klineElements[6].trim());
-                    Instant instant = Instant.ofEpochMilli(closeTimeMillis + 1);
-                    startDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+                    startDateTime = Long.parseLong(klineElements[6].trim());
                 } else {
                     System.err.println("Error: formato de kline inesperado");
                     break;
@@ -53,18 +44,24 @@ public class BinanceApi extends DefaultFetch {
         return fullResponse;
     }
 
-    public BinanceApi(String api_url, String symbol) {
-        super(api_url, symbol);
-    }
-
     @Override
-    public String fetchInformation() {
-        return super.fetchInformation();
-    }
-
-    @Override
-    public String fetchWhenInformation(LocalDateTime startTime, LocalDateTime endTime) {
+    public String fetchWhenInformation(long startTime, long endTime) {
         return super.fetchWhenInformation(startTime, endTime);
     }
 
+    public long getStartDateTime() {
+        return startDateTime;
+    }
+
+    public void setStartDateTime(long startDateTime) {
+        this.startDateTime = startDateTime;
+    }
+
+    public long getEndDateTime() {
+        return endDateTime;
+    }
+
+    public void setEndDateTime(long endDateTime) {
+        this.endDateTime = endDateTime;
+    }
 }

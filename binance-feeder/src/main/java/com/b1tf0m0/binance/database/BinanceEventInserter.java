@@ -8,7 +8,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 
 public class BinanceEventInserter {
-
+    private long lastKlineIntroduced;
     public void insertEvent(BinanceKline binanceKline) {
         try (Connection conn = DriverManager.getConnection(DatabaseManager.getDatabaseUrl())) {
             String sql = "INSERT INTO BinanceEvents (Kline_Open_Time, open_price, high_price, low_price, close_price, volume, Kline_Close_Time, quote_asset_volume, number_of_trades) " +
@@ -26,9 +26,19 @@ public class BinanceEventInserter {
                 pstmt.setDouble(8, Double.parseDouble(binanceKline.getQuoteAssetVolume()));
                 pstmt.setInt(9, binanceKline.getNumberOfTrades());
                 pstmt.executeUpdate();
+                lastKlineIntroduced = KlineCloseTime.toInstant().toEpochMilli();
+                setLastKlineIntroduced(lastKlineIntroduced);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public long getLastKlineIntroduced() {
+        return lastKlineIntroduced;
+    }
+
+    public void setLastKlineIntroduced(long lastKlineIntroduced) {
+        this.lastKlineIntroduced = lastKlineIntroduced;
     }
 }
