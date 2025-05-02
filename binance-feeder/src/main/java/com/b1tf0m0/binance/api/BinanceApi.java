@@ -1,8 +1,9 @@
 package com.b1tf0m0.binance.api;
 
-import com.b1tf0m0.binance.feeder.BinanceFeeder;
+import com.b1tf0m0.binance.processor.BinanceRawProcessor;
 import com.b1tf0m0.common.fetch.DefaultBinanceFetchClasses.DefaultBinanceFetch;
 import com.b1tf0m0.common.json.JSONParse;
+
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -20,24 +21,29 @@ public class BinanceApi extends DefaultBinanceFetch {
         this.setSymbol(symbol);
     }
 
-    public ArrayList<String> obtainFullResponse() {
-        ArrayList<String> fullResponse = new ArrayList<>();
+    public ArrayList<ArrayList<BinanceKline>> obtainFullResponse() {
+        ArrayList<ArrayList<BinanceKline>> fullResponse = new ArrayList<>();
         BinanceApi binanceApi = new BinanceApi("BTCUSDT");
-        for (int i = 0; i < 11; i++) {
-            String response = binanceApi.fetchWhenInformation(startDateTime, endDateTime);
-            fullResponse.add(response);
+        int allTime = 11;
+        for (int i=0;i<allTime;i++) {
+            String eachResponse = binanceApi.fetchWhenInformation(startDateTime, endDateTime);
+            if (eachResponse == null || eachResponse.isEmpty()) {
+                break;
+            }
             try {
-                JSONParse responseJSArray = new JSONParse(response);
-                String lastKline = responseJSArray.parseArray().get(999).toString();
-                String[] klineElements = lastKline.replace("[", "").replace("]", "").split(",");
-                if (klineElements.length >= 7) {
-                    startDateTime = Long.parseLong(klineElements[6].trim());
-                } else {
-                    System.err.println("Error: formato de kline inesperado");
+                JSONParse jsonArrayOfKlines = new JSONParse(eachResponse);
+                if (jsonArrayOfKlines.parseArray().isEmpty()) {
                     break;
                 }
+                BinanceRawProcessor processor = new BinanceRawProcessor();
+                ArrayList<BinanceKline> binanceKlineArray = processor.processRawToObject(eachResponse);
+                if (binanceKlineArray != null && !binanceKlineArray.isEmpty()) {
+                    fullResponse.add(binanceKlineArray);
+                    BinanceKline lastKline = binanceKlineArray.getLast();
+                    setStartDateTime(lastKline.getKlineCloseTime());
+                }
             } catch (Exception e) {
-                System.err.println("Error procesando la respuesta: " + e.getMessage());
+                System.err.println("Error processing response: " + e.getMessage());
                 break;
             }
         }

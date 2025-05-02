@@ -1,5 +1,6 @@
 package com.b1tf0m0.binance.feeder.save;
 
+import com.b1tf0m0.binance.api.BinanceKline;
 import com.b1tf0m0.binance.database.BinanceEventInserter;
 import com.b1tf0m0.binance.processor.BinanceRawProcessor;
 import com.b1tf0m0.common.broker.EventPublisher;
@@ -17,9 +18,11 @@ public class SaveBinanceEvent {
             fileSaver.saveEvent(TOPIC_NAME, SOURCE_SYSTEM, eventJsonString);
             BinanceEventInserter inserter = new BinanceEventInserter();
             BinanceRawProcessor processor = new BinanceRawProcessor();
-            inserter.insertEvent(processor.processRawToObject(eventJsonString));
-            EventPublisher.publishEvent(TOPIC_NAME, eventJsonString, SOURCE_SYSTEM);
-            System.out.println("✅ Evento de Binance publicado en topic: " + TOPIC_NAME);
+            for (BinanceKline eachKline: processor.processRawToObject(eventJsonString)){
+                inserter.insertEvent(eachKline);
+                EventPublisher.publishEvent(TOPIC_NAME, eventJsonString, SOURCE_SYSTEM);
+                System.out.println("✅ Evento de Binance publicado en topic: " + TOPIC_NAME);
+            }
         }
     }
 }

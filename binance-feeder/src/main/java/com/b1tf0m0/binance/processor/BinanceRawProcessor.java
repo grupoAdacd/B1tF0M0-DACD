@@ -1,32 +1,39 @@
 package com.b1tf0m0.binance.processor;
 
 import com.b1tf0m0.binance.api.BinanceKline;
-import com.b1tf0m0.binance.feeder.BinanceFeeder;
 import com.b1tf0m0.common.json.JSONParse;
-import org.json.JSONArray;
+
+import java.util.ArrayList;
 
 public class BinanceRawProcessor {
-
-    public BinanceKline processRawToObject(String eventJsonString) {
-        if (!eventJsonString.isEmpty() && eventJsonString != null) {
-            JSONParse eventParser = new JSONParse(eventJsonString);
-            System.out.println(eventParser);
-            for (int i=0; i<1000; i++) {
-                JSONArray jsonArray = eventParser.parseArray();
-                JSONArray Kline = new JSONArray(jsonArray.get(i));
-                return new BinanceKline(
-                        Kline.getLong(1),
-                        Kline.getString(2),
-                        Kline.getString(3),
-                        Kline.getString(4),
-                        Kline.getString(5),
-                        Kline.getString(6),
-                        Kline.getLong(7),
-                        Kline.getString(8),
-                        Kline.getInt(9)
-                );
+    public ArrayList<BinanceKline> processRawToObject(String eventJsonString) {
+        if (!eventJsonString.isEmpty()) {
+            try {
+                JSONParse eventParser = new JSONParse(eventJsonString);
+                ArrayList<BinanceKline> allKlinesObject = new ArrayList<>();
+                for (int i = 0; i < eventParser.parseArray().length(); i++) {
+                    JSONParse Kline = new JSONParse(eventParser.parseArray().getJSONArray(i).toString());
+                    if (Kline.parseArray().length() >= 10){
+                        BinanceKline binanceKline = new BinanceKline(
+                                Kline.parseArray().getLong(0),
+                                Kline.parseArray().getString(1),
+                                Kline.parseArray().getString(2),
+                                Kline.parseArray().getString(3),
+                                Kline.parseArray().getString(4),
+                                Kline.parseArray().getString(5),
+                                Kline.parseArray().getLong(6),
+                                Kline.parseArray().getString(7),
+                                Kline.parseArray().getInt(8)
+                        );
+                        allKlinesObject.add(binanceKline);
+                    }
+                }
+                return allKlinesObject;
+            } catch (Exception e){
+                System.err.println("Error parsing JSON: "+e.getMessage());
+                return new ArrayList<>();
             }
         }
-        return null;
+        return new ArrayList<>();
     }
 }
